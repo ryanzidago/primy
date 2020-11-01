@@ -2,6 +2,10 @@ defmodule Primy.Worker do
   use Task
   alias Primy.{Prime, Server}
 
+  def start_link(_) do
+    start_link()
+  end
+
   def start_link() do
     Task.start_link(__MODULE__, :init, [])
   end

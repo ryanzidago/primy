@@ -22,10 +22,13 @@ defmodule Primy.Server do
     GenServer.call(__MODULE__, :status)
   end
 
+  def assign_worker do
+    GenServer.cast(__MODULE__, :assign_worker)
+  end
+
   @impl GenServer
   def init([n]) do
-    {:ok, worker_pid} = Worker.start_link()
-    state = %{number: n, highest_prime: nil, worker_pid: worker_pid, primes: []}
+    state = %{number: n, highest_prime: nil, worker_pid: nil, primes: []}
     {:ok, state}
   end
 
@@ -50,6 +53,14 @@ defmodule Primy.Server do
     primes = [n | primes]
     highest_prime = Enum.max(primes)
     state = %{state | primes: primes, highest_prime: highest_prime}
+    {:noreply, state}
+  end
+
+  @impl GenServer
+  def handle_cast(:assign_worker, state) do
+    {:ok, worker_pid} = Worker.start_link()
+    state = %{state | worker_pid: worker_pid}
+
     {:noreply, state}
   end
 end
