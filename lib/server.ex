@@ -2,7 +2,7 @@ defmodule Primy.Server do
   use GenServer
   alias Primy.Worker
 
-  @server_addr System.get_env("SERVER_ADDR") |> String.to_existing_atom()
+  @server_addr System.get_env("SERVER_ADDR") |> String.to_atom()
 
   def start_link(n \\ 0) do
     GenServer.start_link(__MODULE__, [n], name: __MODULE__)
