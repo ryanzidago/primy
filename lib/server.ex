@@ -2,9 +2,7 @@ defmodule Primy.Server do
   use GenServer
   alias Primy.Worker
 
-  def set_server_addr(server_addr) do
-    @server_addr = server_addr
-  end
+  @server_addr System.get_env("SERVER_ADDR") || :"no-addr"
 
   def start_link(n \\ 0) do
     GenServer.start_link(__MODULE__, [n], name: __MODULE__)
