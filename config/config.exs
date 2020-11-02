@@ -1,6 +1,10 @@
 import Mix.Config
 
-server_addr = System.get_env("SERVER_ADDR")
+server_addr =
+  case System.get_env("SERVER_ADDR") do
+    nil -> Node.self()
+    server_addr -> String.to_atom(server_addr)
+  end
 
 config :primy,
-  server_addr: if(server_addr, do: String.to_atom(server_addr), else: :nonode@nohost)
+  server_addr: server_addr
