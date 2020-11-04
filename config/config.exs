@@ -1,4 +1,4 @@
-import Mix.Config
+import Config
 
 server_addr =
   case System.get_env("SERVER_ADDR") do
@@ -8,3 +8,5 @@ server_addr =
 
 config :primy,
   server_addr: server_addr
+
+import_config "#{Mix.env()}.exs"
