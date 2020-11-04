@@ -2,28 +2,30 @@ defmodule Primy.Server do
   use GenServer
   alias Primy.Worker
 
+  @server_addr Application.get_env(:primy, :server_addr)
+
   def start_link(n \\ 0) do
     GenServer.start_link(__MODULE__, [n], name: __MODULE__)
   end
 
   def request_number do
-    GenServer.call(__MODULE__, :request_number)
+    GenServer.call({__MODULE__, @server_addr}, :request_number)
   end
 
   def assign_prime(n) do
-    GenServer.cast(__MODULE__, {:assign_prime, n})
+    GenServer.cast({__MODULE__, @server_addr}, {:assign_prime, n})
   end
 
   def highest_prime do
-    GenServer.call(__MODULE__, :highest_prime)
+    GenServer.call({__MODULE__, @server_addr}, :highest_prime)
   end
 
   def status do
-    GenServer.call(__MODULE__, :status)
+    GenServer.call({__MODULE__, @server_addr}, :status)
   end
 
   def assign_worker do
-    GenServer.cast(__MODULE__, :assign_worker)
+    GenServer.cast({__MODULE__, @server_addr}, :assign_worker)
   end
 
   @impl GenServer

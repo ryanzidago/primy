@@ -1,6 +1,15 @@
 defmodule Primy.ServerTest do
   use ExUnit.Case
-  alias Primy.{ApplicationSupervisor, Server, Worker}
+  alias Primy.{ApplicationSupervisor, Server}
+
+  @test_server_addr Application.get_env(:primy, :server_addr)
+
+  setup_all do
+    {"", 0} = System.cmd("epmd", ~w(-daemon))
+    {:ok, _pid} = Node.start(@test_server_addr)
+
+    :ok
+  end
 
   setup do
     :ok = Supervisor.terminate_child(ApplicationSupervisor, Server)
