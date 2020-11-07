@@ -62,8 +62,8 @@ defmodule Primy.Server do
   @impl GenServer
   def handle_cast(:assign_worker, state) do
     {:ok, worker_pid} =
-      DynamicSupervisor.start_child(
-        {Primy.DynamicSupervisor, get_worker_addr()},
+      Task.Supervisor.start_child(
+        {Primy.TaskSupervisor, get_worker_addr()},
         Worker,
         :run,
         []

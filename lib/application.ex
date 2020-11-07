@@ -4,7 +4,7 @@ defmodule Primy.Application do
   def start(_type, _args) do
     children = [
       {Primy.Server, 0},
-      {DynamicSupervisor, strategy: :one_for_one, name: Primy.DynamicSupervisor}
+      {Task.Supervisor, name: Primy.TaskSupervisor}
     ]
 
     opts = [strategy: :one_for_one, name: Primy.ApplicationSupervisor]
