@@ -29,7 +29,7 @@ defmodule Primy.Server do
 
   @impl GenServer
   def init([n]) do
-    state = %{number: n, highest_prime: nil, worker_pid: nil, primes: []}
+    state = %{number: n, highest_prime: nil, worker_pids: [], primes: []}
     {:ok, state}
   end
 
@@ -58,7 +58,7 @@ defmodule Primy.Server do
   end
 
   @impl GenServer
-  def handle_cast(:assign_worker, state) do
+  def handle_cast(:assign_worker, %{worker_pids: worker_pids} = state) do
     {:ok, worker_pid} =
       Task.Supervisor.start_child(
         {Primy.TaskSupervisor, worker_addr()},
@@ -67,7 +67,7 @@ defmodule Primy.Server do
         []
       )
 
-    state = %{state | worker_pid: worker_pid}
+    state = %{state | worker_pids: [worker_pid | worker_pids]}
 
     {:noreply, state}
   end
@@ -79,8 +79,13 @@ defmodule Primy.Server do
   defp worker_addr do
     case Node.list() do
       [] ->
-        Logger.warn("No nodes are actually connected to #{inspect(server_addr())}\n
-        Falling back to spawning worker on #{inspect(server_addr())}")
+        Logger.info(
+          "No worker nodes are actually connected to #{inspect(server_addr())}. Falling back to spawning worker on #{
+            inspect(server_addr())
+          }"
+        )
+
+        server_addr()
 
       worker_addrs ->
         Enum.random(worker_addrs)
