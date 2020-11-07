@@ -7,7 +7,7 @@ defmodule Primy.Application do
       {Task.Supervisor, name: Primy.TaskSupervisor}
     ]
 
-    opts = [strategy: :one_for_one, name: Primy.ApplicationSupervisor]
+    opts = [strategy: :rest_for_one, name: Primy.ApplicationSupervisor]
     Supervisor.start_link(children, opts)
   end
 end
