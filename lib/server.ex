@@ -1,6 +1,7 @@
 defmodule Primy.Server do
   use GenServer
   alias Primy.Worker
+  require Logger
 
   @server_addr Application.get_env(:primy, :server_addr)
 
@@ -60,9 +61,27 @@ defmodule Primy.Server do
 
   @impl GenServer
   def handle_cast(:assign_worker, state) do
-    {:ok, worker_pid} = Worker.start_link()
+    {:ok, worker_pid} =
+      DynamicSupervisor.start_child(
+        {Primy.DynamicSupervisor, get_worker_addr()},
+        Worker,
+        :run,
+        []
+      )
+
     state = %{state | worker_pid: worker_pid}
 
     {:noreply, state}
+  end
+
+  defp get_worker_addr do
+    case Node.list() do
+      [] ->
+        Logger.warn("No nodes are actually connected to #{inspect(@server_addr)}\n
+        Falling back to spawning worker on #{inspect(@server_addr)}")
+
+      worker_addrs ->
+        Enum.random(worker_addrs)
+    end
   end
 end
