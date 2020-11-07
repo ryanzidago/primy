@@ -44,14 +44,14 @@ defmodule Primy.ServerTest do
       Server.assign_prime(3)
       Server.assign_prime(5)
 
-      assert %{highest_prime: 5, primes: [5, 3], worker_pid: nil, number: 0} == Server.status()
+      assert %{highest_prime: 5, primes: [5, 3], worker_pids: [], number: 0} == Server.status()
     end
   end
 
   describe "assign_worker/0" do
     test "spawns a Worker process and update the Server's state with the Worker's pid" do
       assert :ok = Server.assign_worker()
-      assert %{worker_pid: worker_pid} = Server.status()
+      assert %{worker_pids: [worker_pid]} = Server.status()
       assert Process.alive?(worker_pid)
 
       assert Process.exit(worker_pid, :kill)
