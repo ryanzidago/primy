@@ -3,30 +3,28 @@ defmodule Primy.Server do
   alias Primy.Worker
   require Logger
 
-  @server_addr Application.get_env(:primy, :server_addr)
-
   def start_link(n \\ 0) do
     GenServer.start_link(__MODULE__, [n], name: __MODULE__)
   end
 
   def request_number do
-    GenServer.call({__MODULE__, @server_addr}, :request_number)
+    GenServer.call({__MODULE__, server_addr()}, :request_number)
   end
 
   def assign_prime(n) do
-    GenServer.cast({__MODULE__, @server_addr}, {:assign_prime, n})
+    GenServer.cast({__MODULE__, server_addr()}, {:assign_prime, n})
   end
 
   def highest_prime do
-    GenServer.call({__MODULE__, @server_addr}, :highest_prime)
+    GenServer.call({__MODULE__, server_addr()}, :highest_prime)
   end
 
   def status do
-    GenServer.call({__MODULE__, @server_addr}, :status)
+    GenServer.call({__MODULE__, server_addr()}, :status)
   end
 
   def assign_worker do
-    GenServer.cast({__MODULE__, @server_addr}, :assign_worker)
+    GenServer.cast({__MODULE__, server_addr()}, :assign_worker)
   end
 
   @impl GenServer
@@ -63,7 +61,7 @@ defmodule Primy.Server do
   def handle_cast(:assign_worker, state) do
     {:ok, worker_pid} =
       Task.Supervisor.start_child(
-        {Primy.TaskSupervisor, get_worker_addr()},
+        {Primy.TaskSupervisor, worker_addr()},
         Worker,
         :run,
         []
@@ -74,11 +72,15 @@ defmodule Primy.Server do
     {:noreply, state}
   end
 
-  defp get_worker_addr do
+  defp server_addr do
+    Application.get_env(:primy, :server_addr)
+  end
+
+  defp worker_addr do
     case Node.list() do
       [] ->
-        Logger.warn("No nodes are actually connected to #{inspect(@server_addr)}\n
-        Falling back to spawning worker on #{inspect(@server_addr)}")
+        Logger.warn("No nodes are actually connected to #{inspect(server_addr())}\n
+        Falling back to spawning worker on #{inspect(server_addr())}")
 
       worker_addrs ->
         Enum.random(worker_addrs)
