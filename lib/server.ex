@@ -1,6 +1,6 @@
 defmodule Primy.Server do
   use GenServer
-  alias Primy.Worker
+  alias Primy.{Worker, WorkerRegistry}
   require Logger
 
   def start_link do
@@ -31,6 +31,10 @@ defmodule Primy.Server do
     GenServer.cast({__MODULE__, server_addr()}, :assign_worker)
   end
 
+  def assign_worker(n) do
+    GenServer.cast({__MODULE__, server_addr()}, {:assign_worker, n})
+  end
+
   @impl GenServer
   def init([n]) do
     state = %{number: n, highest_prime: nil, worker_pids: [], primes: []}
@@ -58,22 +62,33 @@ defmodule Primy.Server do
     primes = [n | primes]
     highest_prime = Enum.max(primes)
     state = %{state | primes: primes, highest_prime: highest_prime}
+
     {:noreply, state}
   end
 
   @impl GenServer
   def handle_cast(:assign_worker, %{worker_pids: worker_pids} = state) do
-    {:ok, worker_pid} =
-      Task.Supervisor.start_child(
-        {Primy.TaskSupervisor, worker_addr()},
-        Worker,
-        :run,
-        []
-      )
-
+    {:ok, worker_pid} = do_assign_worker()
     state = %{state | worker_pids: [worker_pid | worker_pids]}
 
     {:noreply, state}
+  end
+
+  @impl GenServer
+  def handle_cast({:assign_worker, n}, %{worker_pids: worker_pids} = state) do
+    {:ok, worker_pid} = do_assign_worker([n])
+    state = %{state | worker_pids: [worker_pid | worker_pids]}
+
+    {:noreply, state}
+  end
+
+  defp do_assign_worker(arg \\ []) do
+    Task.Supervisor.start_child(
+      {Primy.TaskSupervisor, worker_addr()},
+      Worker,
+      :init,
+      arg
+    )
   end
 
   defp server_addr do

@@ -3,6 +3,7 @@ defmodule Primy.Application do
 
   def start(_type, _args) do
     children = [
+      Primy.WorkerRegistry,
       Primy.Server,
       {Task.Supervisor, name: Primy.TaskSupervisor}
     ]
