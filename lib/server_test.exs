@@ -1,7 +1,6 @@
 defmodule Primy.ServerTest do
   use ExUnit.Case, async: true
   alias Primy.Server
-  import Primy.TestSetup
 
   @test_server_addr Application.get_env(:primy, :server_addr)
 
@@ -9,17 +8,13 @@ defmodule Primy.ServerTest do
     {"", 0} = System.cmd("epmd", ~w(-daemon))
     {:ok, _pid} = Node.start(@test_server_addr)
 
-    maybe_kill_app_supervisor()
-    start_test_app_supervisor()
-
     :ok
   end
 
   setup do
-    find_and_kill_process(Server)
-    wait_until_restarted(Server)
+    {:ok, server_pid} = Server.start_link()
 
-    :ok
+    on_exit(fn -> assert true = Process.exit(server_pid, :kill) end)
   end
 
   describe "request_number/0" do
@@ -50,6 +45,17 @@ defmodule Primy.ServerTest do
   end
 
   describe "assign_worker/0" do
+    setup do
+      {:ok, supervisor_pid} =
+        Supervisor.start_link(
+          [{Task.Supervisor, name: Primy.TaskSupervisor}],
+          strategy: :rest_for_one,
+          name: Primy.ApplicationSupervisor
+        )
+
+      on_exit(fn -> assert true = Process.exit(supervisor_pid, :kill) end)
+    end
+
     test "spawns a Worker process and update the Server's state with the Worker's pid" do
       assert :ok = Server.assign_worker()
       assert %{worker_pids: [worker_pid]} = Server.status()

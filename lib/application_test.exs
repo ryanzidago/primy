@@ -1,11 +1,19 @@
 defmodule Primy.ApplicationTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   alias Primy.{Server, TaskSupervisor}
-  import Primy.TestSetup
 
-  setup_all do
-    maybe_kill_app_supervisor()
-    start_test_app_supervisor()
+  setup do
+    children = [
+      Primy.Server,
+      {Task.Supervisor, name: Primy.TaskSupervisor}
+    ]
+
+    opts = [strategy: :rest_for_one, name: Primy.ApplicationSupervisor]
+    {:ok, supervisor_pid} = Supervisor.start_link(children, opts)
+
+    on_exit(fn ->
+      Process.exit(supervisor_pid, :kill)
+    end)
 
     :ok
   end
