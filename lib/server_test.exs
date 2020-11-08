@@ -1,6 +1,7 @@
 defmodule Primy.ServerTest do
-  use ExUnit.Case
-  alias Primy.{ApplicationSupervisor, Server}
+  use ExUnit.Case, async: true
+  alias Primy.Server
+  import Primy.TestSetup
 
   @test_server_addr Application.get_env(:primy, :server_addr)
 
@@ -8,12 +9,15 @@ defmodule Primy.ServerTest do
     {"", 0} = System.cmd("epmd", ~w(-daemon))
     {:ok, _pid} = Node.start(@test_server_addr)
 
+    maybe_kill_app_supervisor()
+    start_test_app_supervisor()
+
     :ok
   end
 
   setup do
-    :ok = Supervisor.terminate_child(ApplicationSupervisor, Server)
-    {:ok, _pid} = Server.start_link()
+    find_and_kill_process(Server)
+    wait_until_restarted(Server)
 
     :ok
   end
@@ -41,10 +45,7 @@ defmodule Primy.ServerTest do
 
   describe "status/0" do
     test "get the Server's state" do
-      Server.assign_prime(3)
-      Server.assign_prime(5)
-
-      assert %{highest_prime: 5, primes: [5, 3], worker_pids: [], number: 0} == Server.status()
+      assert %{highest_prime: nil, primes: [], worker_pids: [], number: 0} == Server.status()
     end
   end
 

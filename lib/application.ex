@@ -3,7 +3,7 @@ defmodule Primy.Application do
 
   def start(_type, _args) do
     children = [
-      {Primy.Server, 0},
+      Primy.Server,
       {Task.Supervisor, name: Primy.TaskSupervisor}
     ]
 

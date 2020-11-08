@@ -1,6 +1,14 @@
 defmodule Primy.ApplicationTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias Primy.{Server, TaskSupervisor}
+  import Primy.TestSetup
+
+  setup_all do
+    maybe_kill_app_supervisor()
+    start_test_app_supervisor()
+
+    :ok
+  end
 
   describe "Primy.Server" do
     test "is restarted once it crashes" do
@@ -39,7 +47,7 @@ defmodule Primy.ApplicationTest do
       {:DOWN, ^ref, :process, ^pid, _reason} ->
         case Process.whereis(module) do
           nil -> send(self(), {:DOWN, ref, :process, pid, :killed})
-          _pid -> assert Process.alive?(pid)
+          pid -> assert Process.alive?(pid)
         end
     after
       500 ->
