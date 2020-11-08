@@ -3,9 +3,12 @@ defmodule Primy.Server do
   alias Primy.Worker
   require Logger
 
-  def start_link(opts \\ []) do
-    name = Keyword.get(opts, :name, __MODULE__)
-    GenServer.start_link(__MODULE__, [0], name: name)
+  def start_link do
+    start_link([])
+  end
+
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, [0], name: __MODULE__)
   end
 
   def request_number do
