@@ -1,6 +1,6 @@
 defmodule Primy.Server do
   use GenServer
-  alias Primy.{Worker, WorkerRegistry}
+  alias Primy.Worker
   require Logger
 
   def start_link do
@@ -37,7 +37,7 @@ defmodule Primy.Server do
 
   @impl GenServer
   def init([n]) do
-    state = %{number: n, highest_prime: nil, worker_pids: [], primes: []}
+    state = %{number: n, highest_prime: nil, primes: []}
     {:ok, state}
   end
 
@@ -67,17 +67,15 @@ defmodule Primy.Server do
   end
 
   @impl GenServer
-  def handle_cast(:assign_worker, %{worker_pids: worker_pids} = state) do
-    {:ok, worker_pid} = do_assign_worker()
-    state = %{state | worker_pids: [worker_pid | worker_pids]}
+  def handle_cast(:assign_worker, state) do
+    {:ok, _worker_pid} = do_assign_worker()
 
     {:noreply, state}
   end
 
   @impl GenServer
-  def handle_cast({:assign_worker, n}, %{worker_pids: worker_pids} = state) do
-    {:ok, worker_pid} = do_assign_worker([n])
-    state = %{state | worker_pids: [worker_pid | worker_pids]}
+  def handle_cast({:assign_worker, n}, state) do
+    {:ok, _worker_pid} = do_assign_worker([n])
 
     {:noreply, state}
   end

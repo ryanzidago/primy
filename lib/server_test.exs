@@ -1,6 +1,7 @@
 defmodule Primy.ServerTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   alias Primy.Server
+  import Support.TestHelpers
 
   @test_server_addr Application.get_env(:primy, :server_addr)
 
@@ -40,7 +41,7 @@ defmodule Primy.ServerTest do
 
   describe "status/0" do
     test "get the Server's state" do
-      assert %{highest_prime: nil, primes: [], worker_pids: [], number: 0} == Server.status()
+      assert %{highest_prime: nil, primes: [], number: 0} == Server.status()
     end
   end
 
@@ -56,9 +57,9 @@ defmodule Primy.ServerTest do
       on_exit(fn -> assert true = Process.exit(supervisor_pid, :kill) end)
     end
 
-    test "spawns a Worker process and update the Server's state with the Worker's pid" do
+    test "spawns a Worker process" do
       assert :ok = Server.assign_worker()
-      assert %{worker_pids: [worker_pid]} = Server.status()
+      assert [worker_pid] = wait_until(fn -> Task.Supervisor.children(Primy.TaskSupervisor) end)
       assert Process.alive?(worker_pid)
 
       assert Process.exit(worker_pid, :kill)
@@ -70,4 +71,11 @@ defmodule Primy.ServerTest do
     |> Process.whereis()
     |> :sys.get_state()
   end
+
+  # defp wait_until(func) when is_function(func) do
+  #   case func.() do
+  #     result when result == [] or is_nil(result) -> :timer.sleep(100) && func.()
+  #     result -> result
+  #   end
+  # end
 end
