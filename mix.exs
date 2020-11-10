@@ -7,7 +7,7 @@ defmodule Primy.MixProject do
       version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      test_paths: ~w(test lib),
+      test_paths: ~w(lib),
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()
     ]
