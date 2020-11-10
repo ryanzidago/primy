@@ -7,7 +7,8 @@ defmodule Primy.MixProject do
       version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      test_paths: ~w(lib),
+      test_paths: ~w(test lib),
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()
     ]
   end
@@ -27,6 +28,9 @@ defmodule Primy.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
   end
+
+  defp elixirc_paths(:test), do: ~w(test/support lib)
+  defp elixirc_paths(_), do: ~w(lib)
 
   defp maybe_start_app do
     case Mix.env() do
