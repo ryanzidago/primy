@@ -1,26 +1,31 @@
 defmodule Primy.WorkerRegistry do
   use GenServer
   require Logger
+  import Primy.Utils
   alias Primy.Server
+
+  def start_link do
+    start_link([])
+  end
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def register(worker_pid) do
-    GenServer.cast(__MODULE__, {:register, worker_pid})
+    GenServer.cast({__MODULE__, server_addr()}, {:register, worker_pid})
   end
 
   def lookup(worker_pid) do
-    GenServer.call(__MODULE__, {:lookup, worker_pid})
+    GenServer.call({__MODULE__, server_addr()}, {:lookup, worker_pid})
   end
 
   def update(worker_pid, metadata) do
-    GenServer.cast(__MODULE__, {:update, worker_pid, metadata})
+    GenServer.cast({__MODULE__, server_addr()}, {:update, worker_pid, metadata})
   end
 
   def unregister(worker_pid) do
-    GenServer.cast(__MODULE__, {:unregister, worker_pid})
+    GenServer.cast({__MODULE__, server_addr()}, {:unregister, worker_pid})
   end
 
   @impl GenServer
