@@ -1,0 +1,60 @@
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 1
+Duration: 5000 milliseconds
+Highest prime found in duration: 199109
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 10
+Duration: 5000 milliseconds
+Highest prime found in duration: 196613
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 100
+Duration: 5000 milliseconds
+Highest prime found in duration: 190921
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 1000
+Duration: 5000 milliseconds
+Highest prime found in duration: 188933
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 10000
+Duration: 5000 milliseconds
+Highest prime found in duration: 180379
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 1
+Duration: 10000 milliseconds
+Highest prime found in duration: 294793
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 10
+Duration: 10000 milliseconds
+Highest prime found in duration: 271109
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 100
+Duration: 10000 milliseconds
+Highest prime found in duration: 274277
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 1000
+Duration: 10000 milliseconds
+Highest prime found in duration: 267403
+
+2020-11-15
+Benchmarking Primy.Server
+Number of spawned worker: 10000
+Duration: 10000 milliseconds
+Highest prime found in duration: 265787
+
