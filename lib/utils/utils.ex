@@ -20,4 +20,13 @@ defmodule Primy.Utils do
         Enum.random(worker_addrs)
     end
   end
+
+  def random_server_pid do
+    {_, server_pid, _, _} =
+      Primy.DynamicSupervisor
+      |> Supervisor.which_children()
+      |> Enum.random()
+
+    server_pid
+  end
 end

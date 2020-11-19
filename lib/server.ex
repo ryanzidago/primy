@@ -1,38 +1,43 @@
 defmodule Primy.Server do
   use GenServer
+
   alias Primy.Worker
   import Primy.Utils
+
+  def start do
+    DynamicSupervisor.start_child(Primy.DynamicSupervisor, Primy.Server)
+  end
 
   def start_link do
     start_link([])
   end
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, [0], name: __MODULE__)
+    GenServer.start_link(__MODULE__, [0])
   end
 
   def request_number do
-    GenServer.call({__MODULE__, server_addr()}, :request_number)
+    GenServer.call(random_server_pid(), :request_number)
   end
 
   def assign_prime(n) do
-    GenServer.cast({__MODULE__, server_addr()}, {:assign_prime, n})
+    GenServer.cast(random_server_pid(), {:assign_prime, n})
   end
 
   def highest_prime do
-    GenServer.call({__MODULE__, server_addr()}, :highest_prime)
+    GenServer.call(random_server_pid(), :highest_prime)
   end
 
   def status do
-    GenServer.call({__MODULE__, server_addr()}, :status)
+    GenServer.call(random_server_pid(), :status)
   end
 
   def assign_worker do
-    GenServer.cast({__MODULE__, server_addr()}, :assign_worker)
+    GenServer.cast(random_server_pid(), :assign_worker)
   end
 
   def assign_worker(n) do
-    GenServer.cast({__MODULE__, server_addr()}, {:assign_worker, n})
+    GenServer.cast(random_server_pid(), {:assign_worker, n})
   end
 
   @impl GenServer

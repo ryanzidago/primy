@@ -4,7 +4,7 @@ defmodule Primy.Application do
   def start(_type, _args) do
     children = [
       Primy.WorkerRegistry,
-      Primy.Server,
+      {DynamicSupervisor, strategy: :one_for_one, name: Primy.DynamicSupervisor},
       {Task.Supervisor, name: Primy.TaskSupervisor}
     ]
 
